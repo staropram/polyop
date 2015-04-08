@@ -948,3 +948,22 @@ int polynomial_is_zero(Polynomial *p) {
 	}
 	return p->components[0]->coefficient==0 && p->components[0]->exponent==0;
 }
+
+/// Returns 1 if components a and b have equal coefficients and exponents, otherwise 0.
+int component_is_equal(Component *a, Component *b) {
+	return a->coefficient==b->coefficient && a->exponent==b->exponent;
+}
+
+/// Returns 1 if polynomials a and b have numerically the same components, otherwise 0.
+int polynomial_is_equal(Polynomial *a, Polynomial *b) {
+	if(a->num_components!=b->num_components) {
+		return 0;
+	}
+
+	for(int i=0; i<a->num_components; i++) {
+		if(!component_is_equal(a->components[i],b->components[i])) {
+			return 0;
+		}
+	}
+	return 1;
+}

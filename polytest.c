@@ -324,6 +324,33 @@ int test_polynomial_division() {
 	return ret;
 }
 
+int check_polynomial_comparison(char *lhs, char *rhs, int expected_result) {
+	int ret = 0;
+	Polynomial *a = polynomial_from_string(lhs);
+	Polynomial *b = polynomial_from_string(rhs);
+
+	ret = polynomial_is_equal(a,b);
+	if(ret!=expected_result) {
+		printf("FAIL: Expected result of comparing \"%s\" with \"%s\" is \"%d\", but got: \"%d\"\r\n",lhs,rhs,expected_result,ret);
+	}
+
+	polynomial_free(a);
+	polynomial_free(b);
+	return ret;
+}
+
+int test_polynomial_comparison() {
+	int ret = 0;
+	ret += check_polynomial_comparison("x^2","x^2",1);
+	ret += check_polynomial_comparison("x^2","x^3",0);
+	ret += check_polynomial_comparison("x^2.00","x^2",1);
+	ret += check_polynomial_comparison("0","0",1);
+	ret += check_polynomial_comparison("1x","x",1);
+	ret += check_polynomial_comparison("1x^1","x",1);
+	ret += check_polynomial_comparison("1x^0","1",1);
+	return ret;
+}
+
 typedef int (*test_function)(void);
 
 test_function tests[] = {
@@ -334,6 +361,7 @@ test_function tests[] = {
 	test_polynomial_subtraction,
 	test_polynomial_multiplication,
 	test_polynomial_division,
+	test_polynomial_comparison,
 	NULL
 };
 
@@ -344,8 +372,32 @@ char* test_names[] = {
 	"Addition of polynomials",
 	"Subtraction of polynomials",
 	"Multiplication of polynomials",
-	"Division of polynomials"
+	"Division of polynomials",
+	"Comparison of polynomials"
 };
+
+void github_example() {
+	int extra_division_iterations = 0, comparison = 0, precision = 3;
+	char out_str_a[128], out_str_b[128], out_str_c[128], out_str_d[128];
+	Polynomial *a,*b,*c,*d;
+
+	a = polynomial_from_string("x^2+5x-6");
+	b = polynomial_from_string("x-1");
+	c = polynomial_divide(a,b,extra_division_iterations);
+	d = polynomial_multiply(c,b);
+
+	polynomial_to_string(a,out_str_a,128,precision);
+	polynomial_to_string(b,out_str_b,128,precision);
+	polynomial_to_string(c,out_str_c,128,precision);
+	polynomial_to_string(d,out_str_d,128,precision);
+	printf("Division of \"%s\" and \"%s\": \"%s\"\r\n",out_str_a,out_str_b,out_str_c);
+	printf("Comparison of \"%s\" and \"%s\": %d\r\n",out_str_a,out_str_d,polynomial_is_equal(a,d));
+
+	polynomial_free(a);
+	polynomial_free(b);
+	polynomial_free(c);
+	polynomial_free(d);
+}
 
 int main(int argc, char **argv) {
 	//return test_polynomial_division();
@@ -355,6 +407,8 @@ int main(int argc, char **argv) {
 	//return test_polynomial_addition();
 	//return test_polynomial_subtraction();
 	//return test_polynomial_multiplication();
+	//return test_polynomial_comparison();
+	//
 
 	int num_tests = 0;
 	while(tests[++num_tests]);
